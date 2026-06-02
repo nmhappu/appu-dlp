@@ -272,7 +272,7 @@ export default function App() {
             borderColor: notif.type === 'success' ? `${APP_COLORS.successAccent}30` : `${APP_COLORS.failedAccent}30`,
             color: notif.type === 'success' ? APP_COLORS.successAccent : APP_COLORS.failedAccent
           }}
-          className="fixed top-6 right-6 flex items-center gap-3 px-5 py-4 rounded-xl border shadow-2xl transition-all duration-300 animate-in fade-in slide-in-from-top-4"
+          className="fixed top-6 right-6 flex items-center gap-3 px-5 py-4 rounded-md border shadow-2xl transition-all duration-300 animate-in fade-in slide-in-from-top-4"
         >
           {notif.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
           <div className="text-sm font-medium pr-4">{notif.message}</div>
@@ -293,7 +293,7 @@ export default function App() {
               borderColor: `${APP_COLORS.skyAccent}30`,
               background: `linear-gradient(135deg, ${APP_COLORS.bgSecondary} 0%, ${APP_COLORS.bgHeader} 100%)`
             }}
-            className="w-10 h-10 rounded-xl flex items-center justify-center border shadow-lg relative group overflow-hidden"
+            className="w-10 h-10 rounded-md flex items-center justify-center border shadow-lg relative group overflow-hidden"
           >
             {/* Ambient background glow inside the icon */}
             <div className="absolute inset-0 bg-sky-500/10 opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
@@ -318,7 +318,7 @@ export default function App() {
       <main className="flex-1 max-w-[1000px] w-full mx-auto flex flex-col p-4 md:p-8 gap-6 md:gap-8 min-h-0">
         
         {/* New Download Link Form Section */}
-        <section className="bg-[#141720] rounded-2xl p-6 md:p-8 border border-slate-800/80 shadow-2xl relative overflow-hidden">
+        <section className="bg-[#141720] rounded-lg p-6 md:p-8 border border-slate-800/80 shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 left-0 w-1 h-full bg-sky-500"></div>
           
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
@@ -329,14 +329,14 @@ export default function App() {
             
             {/* Toggler on the opposite side */}
             <div className="flex items-center gap-2 self-start sm:self-center">
-              <div className="flex items-center bg-[#090A0D] p-0.5 rounded-lg border border-slate-800/80">
+              <div className="flex items-center bg-[#090A0D] p-0.5 rounded border border-slate-800/80">
                 <button
                   type="button"
                   onClick={() => {
                     setEngine('yt-dlp');
                     setAnalyzedVideo(null);
                   }}
-                  className={`px-2.5 py-1 text-[10px] uppercase font-sans font-extrabold tracking-wider rounded-md transition-all cursor-pointer ${
+                  className={`px-2.5 py-1 text-[10px] uppercase font-sans font-extrabold tracking-wider rounded-sm transition-all cursor-pointer ${
                     engine === 'yt-dlp'
                       ? 'bg-sky-500 text-white shadow-md shadow-sky-500/25'
                       : 'text-slate-400 hover:text-slate-200'
@@ -351,7 +351,7 @@ export default function App() {
                     setEngine('curl');
                     setAnalyzedVideo(null);
                   }}
-                  className={`px-2.5 py-1 text-[10px] uppercase font-sans font-extrabold tracking-wider rounded-md transition-all cursor-pointer ${
+                  className={`px-2.5 py-1 text-[10px] uppercase font-sans font-extrabold tracking-wider rounded-sm transition-all cursor-pointer ${
                     engine === 'curl'
                       ? 'bg-sky-500 text-white shadow-md shadow-sky-500/25'
                       : 'text-slate-400 hover:text-slate-200'
@@ -370,7 +370,7 @@ export default function App() {
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="Paste media or file link here..." 
-                className="w-full bg-[#0A0B0E] border border-slate-800 focus:border-sky-500/80 rounded-xl pl-5 pr-12 py-4 focus:outline-none text-slate-100 placeholder-slate-600 transition-all font-sans text-sm shadow-inner"
+                className="w-full bg-[#0A0B0E] border border-slate-800 focus:border-sky-500/80 rounded-md pl-5 pr-12 py-4 focus:outline-none text-slate-100 placeholder-slate-600 transition-all font-sans text-sm shadow-inner"
               />
               <div className="absolute right-4 top-4 text-slate-600">
                 <Search className="w-5 h-5" />
@@ -380,7 +380,7 @@ export default function App() {
             <button 
               type="submit"
               disabled={analyzing || !url.trim()}
-              className="bg-sky-600 hover:bg-sky-500 disabled:bg-slate-800 disabled:text-slate-600 text-white font-bold px-8 py-4 rounded-xl transition-all cursor-pointer shadow-lg shadow-sky-950/20 active:scale-98 flex items-center justify-center gap-3 shrink-0"
+              className="bg-sky-600 hover:bg-sky-500 disabled:bg-slate-800 disabled:text-slate-600 text-white font-bold px-8 py-4 rounded-md transition-all cursor-pointer shadow-lg shadow-sky-950/20 active:scale-98 flex items-center justify-center gap-3 shrink-0"
             >
               {analyzing ? (
                 <>
@@ -402,21 +402,21 @@ export default function App() {
               <button 
                 type="button"
                 onClick={() => loadPresetLink('https://www.youtube.com/watch?v=aqz-KE-bpKQ')}
-                className="px-2.5 py-1 text-[11px] bg-sky-500/5 hover:bg-sky-500/15 border border-sky-500/10 text-sky-400 rounded-md transition-colors font-sans cursor-pointer"
+                className="px-2.5 py-1 text-[11px] bg-sky-500/5 hover:bg-sky-500/15 border border-sky-500/10 text-sky-400 rounded transition-colors font-sans cursor-pointer"
               >
                 YouTube Big Buck Bunny
               </button>
               <button 
                 type="button"
                 onClick={() => loadPresetLink('https://www.reddit.com/r/pics/comments/cx7as1/this_is_an_extremely_high_resolution_image/')}
-                className="px-2.5 py-1 text-[11px] bg-orange-500/5 hover:bg-orange-500/15 border border-orange-500/10 text-orange-400 rounded-md transition-colors font-sans cursor-pointer"
+                className="px-2.5 py-1 text-[11px] bg-orange-500/5 hover:bg-orange-500/15 border border-orange-500/10 text-orange-400 rounded transition-colors font-sans cursor-pointer"
               >
                 Reddit Picture
               </button>
               <button 
                 type="button"
                 onClick={() => loadPresetLink('https://files.testfile.org/PDF/10MB-testfile.org.pdf')}
-                className="px-2.5 py-1 text-[11px] bg-emerald-500/5 hover:bg-emerald-500/15 border border-emerald-500/10 text-emerald-400 rounded-md transition-colors font-sans cursor-pointer"
+                className="px-2.5 py-1 text-[11px] bg-emerald-500/5 hover:bg-emerald-500/15 border border-emerald-500/10 text-emerald-400 rounded transition-colors font-sans cursor-pointer"
               >
                 Direct 10MB PDF File
               </button>
@@ -428,7 +428,7 @@ export default function App() {
                 setShowCookies(!showCookies);
                 setCookiesContent('');
               }}
-              className={`px-3 py-1 text-[11px] font-sans flex items-center gap-1.5 rounded-md border transition-all cursor-pointer ${
+              className={`px-3 py-1 text-[11px] font-sans flex items-center gap-1.5 rounded border transition-all cursor-pointer ${
                 cookiesLoaded 
                   ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 font-semibold hover:bg-emerald-500/15' 
                   : 'bg-slate-800/40 border-slate-800 text-slate-400 hover:bg-slate-800 hover:text-slate-300'
@@ -456,7 +456,7 @@ export default function App() {
                   <button 
                     type="button"
                     onClick={() => handleSaveCookies('')}
-                    className="text-[10px] text-red-400 hover:text-red-300 transition-colors font-semibold font-sans cursor-pointer uppercase tracking-widest bg-red-500/5 border border-red-500/10 px-2 py-1 rounded"
+                    className="text-[10px] text-red-400 hover:text-red-300 transition-colors font-semibold font-sans cursor-pointer uppercase tracking-widest bg-red-500/5 border border-red-500/10 px-2 py-1 rounded-sm"
                   >
                     Wipe Active Session Cookies
                   </button>
@@ -467,13 +467,13 @@ export default function App() {
                   value={cookiesContent}
                   onChange={(e) => setCookiesContent(e.target.value)}
                   placeholder="# Netscape HTTP Cookie File&#10;# This file was generated by cookies exporter...&#10;.youtube.com&#10;..."
-                  className="w-full h-32 bg-[#0A0B0E] border border-slate-800 focus:border-sky-500 rounded-lg p-3 text-xs font-mono text-slate-300 focus:outline-none placeholder-slate-700 shadow-inner resize-y"
+                  className="w-full h-32 bg-[#0A0B0E] border border-slate-800 focus:border-sky-500 rounded-md p-3 text-xs font-mono text-slate-300 focus:outline-none placeholder-slate-700 shadow-inner resize-y"
                 />
                 <div className="flex justify-end gap-2 shrink-0">
                   <button 
                     type="button"
                     onClick={() => setShowCookies(false)}
-                    className="px-3.5 py-1.5 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                    className="px-3.5 py-1.5 border border-slate-800 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-md text-xs font-bold transition-all cursor-pointer"
                   >
                     CLOSE
                   </button>
@@ -481,7 +481,7 @@ export default function App() {
                     type="button"
                     onClick={() => handleSaveCookies()}
                     disabled={!cookiesContent.trim()}
-                    className="px-4 py-1.5 bg-sky-500 hover:bg-sky-400 text-white disabled:bg-slate-800 disabled:text-slate-600 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 hover:shadow-lg shadow-sky-500/10"
+                    className="px-4 py-1.5 bg-sky-500 hover:bg-sky-400 text-white disabled:bg-slate-800 disabled:text-slate-600 rounded-md text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 hover:shadow-lg shadow-sky-500/10"
                   >
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     SAVE AND ACTIVATE COOKIES
@@ -494,10 +494,10 @@ export default function App() {
 
         {/* Dynamic Stream Inspecting Results Block */}
         {analyzedVideo && (
-          <section className="bg-[#141720] border-2 border-sky-500/30 rounded-2xl p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+          <section className="bg-[#141720] border-2 border-sky-500/30 rounded-lg p-6 shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="flex flex-col lg:flex-row gap-6">
               {/* Media Card Preview */}
-              <div className="w-full lg:w-72 h-44 bg-slate-900 rounded-xl overflow-hidden relative border border-slate-800/80 flex-shrink-0">
+              <div className="w-full lg:w-72 h-44 bg-slate-900 rounded-md overflow-hidden relative border border-slate-800/80 flex-shrink-0">
                 <img 
                   src={analyzedVideo.thumbnail} 
                   onError={(e) => {
@@ -509,7 +509,7 @@ export default function App() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                 {analyzedVideo.duration && (
-                  <span className="absolute bottom-2 right-2 text-xs font-mono bg-black/90 px-2 py-0.5 rounded text-white border border-slate-800">
+                  <span className="absolute bottom-2 right-2 text-xs font-mono bg-black/90 px-2 py-0.5 rounded-sm text-white border border-slate-800">
                     <Clock className="w-3 h-3 inline-block mr-1" />
                     {formatDuration(analyzedVideo.duration)}
                   </span>
@@ -520,7 +520,7 @@ export default function App() {
               <div className="flex-1 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-1.5">
-                    <span className="text-xs font-semibold px-2 py-0.5 bg-sky-500/20 text-sky-400 rounded border border-sky-400/10">
+                    <span className="text-xs font-semibold px-2 py-0.5 bg-sky-500/20 text-sky-400 rounded-sm border border-sky-400/10">
                       RESOLVED METADATA
                     </span>
                     <span className="text-xs text-slate-500">•</span>
@@ -534,7 +534,7 @@ export default function App() {
                       type="text"
                       value={customFilename}
                       onChange={(e) => setCustomFilename(e.target.value)}
-                      className="bg-[#0A0B0E] border border-slate-800 focus:border-sky-500 px-3.5 py-2.5 rounded-lg text-sm text-slate-100 placeholder-slate-600 transition-colors"
+                      className="bg-[#0A0B0E] border border-slate-800 focus:border-sky-500 px-3.5 py-2.5 rounded-md text-sm text-slate-100 placeholder-slate-600 transition-colors"
                       placeholder="Title on downloaded disk"
                     />
                   </div>
@@ -546,7 +546,7 @@ export default function App() {
                       <button 
                         type="button"
                         onClick={() => setDownloadTarget('browser')}
-                        className={`flex flex-col items-start p-3 bg-[#0A0B0E] border rounded-lg transition-all text-left cursor-pointer ${
+                        className={`flex flex-col items-start p-3 bg-[#0A0B0E] border rounded-md transition-all text-left cursor-pointer ${
                           downloadTarget === 'browser'
                             ? 'border-sky-500 bg-sky-500/10'
                             : 'border-slate-800 hover:border-slate-700/80'
@@ -564,7 +564,7 @@ export default function App() {
                       <button 
                         type="button"
                         onClick={() => setDownloadTarget('server')}
-                        className={`flex flex-col items-start p-3 bg-[#0A0B0E] border rounded-lg transition-all text-left cursor-pointer ${
+                        className={`flex flex-col items-start p-3 bg-[#0A0B0E] border rounded-md transition-all text-left cursor-pointer ${
                           downloadTarget === 'server'
                             ? 'border-emerald-500 bg-emerald-500/10'
                             : 'border-slate-800 hover:border-slate-700/80'
@@ -591,7 +591,7 @@ export default function App() {
                     <select
                       value={selectedFormatId}
                       onChange={(e) => setSelectedFormatId(e.target.value)}
-                      className="bg-[#0A0B0E] border border-slate-800 text-slate-200 outline-none text-sm rounded-lg px-3 py-3 focus:border-sky-500 transition-colors cursor-pointer w-full"
+                      className="bg-[#0A0B0E] border border-slate-800 text-slate-200 outline-none text-sm rounded-md px-3 py-3 focus:border-sky-500 transition-colors cursor-pointer w-full"
                     >
                       {analyzedVideo.formats.map((fmt) => (
                         <option key={fmt.formatId} value={fmt.formatId}>
@@ -604,13 +604,13 @@ export default function App() {
                   <div className="flex gap-2">
                     <button 
                       onClick={() => setAnalyzedVideo(null)}
-                      className="border border-slate-800 hover:bg-slate-800 font-bold px-4 py-3 rounded-xl transition-all cursor-pointer text-xs"
+                      className="border border-slate-800 hover:bg-slate-800 font-bold px-4 py-3 rounded-md transition-all cursor-pointer text-xs"
                     >
                       CANCEL
                     </button>
                     <button 
                       onClick={handleInitiateDownload}
-                      className="flex-1 bg-sky-500 hover:bg-sky-400 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-lg cursor-pointer shadow-sky-400/20 text-xs flex items-center justify-center gap-1.5"
+                      className="flex-1 bg-sky-500 hover:bg-sky-400 text-white font-bold px-6 py-3 rounded-md transition-all shadow-lg cursor-pointer shadow-sky-400/20 text-xs flex items-center justify-center gap-1.5"
                     >
                       <Download className="w-4 h-4" />
                       RUN STREAM RETRIEVAL
@@ -623,7 +623,7 @@ export default function App() {
         )}
 
         {/* Unified Transfers Panel */}
-        <div className="flex-1 flex flex-col min-h-0 bg-[#141720] border border-slate-800/80 rounded-2xl p-6 shadow-2xl">
+        <div className="flex-1 flex flex-col min-h-0 bg-[#141720] border border-slate-800/80 rounded-lg p-6 shadow-2xl">
           <div className="flex items-center justify-between mb-6 shrink-0">
             <h3 className="text-base font-bold text-white flex items-center gap-2">
               Transfers
@@ -642,7 +642,7 @@ export default function App() {
           {/* Scrollable list of transfers */}
           <div className="flex-1 overflow-y-auto space-y-4 pr-1 max-h-[500px]">
             {jobs.length === 0 ? (
-              <div className="bg-[#0D0E12]/30 border border-dashed border-slate-800/60 rounded-2xl p-12 text-center flex flex-col items-center justify-center text-slate-500">
+              <div className="bg-[#0D0E12]/30 border border-dashed border-slate-800/60 rounded-lg p-12 text-center flex flex-col items-center justify-center text-slate-500">
                 <div className="w-12 h-12 rounded-full border border-slate-800 bg-[#0F1117] flex items-center justify-center mb-3">
                   <Globe className="w-5 h-5 text-slate-600" />
                 </div>
@@ -657,7 +657,7 @@ export default function App() {
                 return (
                   <div 
                     key={job.id} 
-                    className={`border rounded-xl p-4 flex flex-col md:flex-row items-center gap-4 transition-all shadow-xl ${
+                    className={`border rounded-md p-4 flex flex-col md:flex-row items-center gap-4 transition-all shadow-xl ${
                       isCompleted 
                         ? 'bg-[#101F1D]/40 border-emerald-500/10 hover:border-emerald-500/30' 
                         : isFailed 
@@ -666,7 +666,7 @@ export default function App() {
                     }`}
                   >
                     {/* Media representation */}
-                    <div className="w-full md:w-32 h-20 bg-[#0A0B0E] rounded-lg shrink-0 overflow-hidden relative border border-slate-800/60 flex items-center justify-center">
+                    <div className="w-full md:w-32 h-20 bg-[#0A0B0E] rounded-md shrink-0 overflow-hidden relative border border-slate-800/60 flex items-center justify-center">
                       {job.thumbnail ? (
                         <img 
                           src={job.thumbnail} 
@@ -681,7 +681,7 @@ export default function App() {
                         </div>
                       )}
                       
-                      <div className="absolute top-1 left-1 px-1.5 py-0.5 bg-black/75 text-[8px] font-mono border border-slate-800 text-sky-400 rounded">
+                      <div className="absolute top-1 left-1 px-1.5 py-0.5 bg-black/75 text-[8px] font-mono border border-slate-800 text-sky-400 rounded-sm">
                         {job.formatId.toUpperCase()}
                       </div>
                     </div>
@@ -776,7 +776,7 @@ export default function App() {
 
                         {isCompleted && (
                           job.fileDeletedFromHost ? (
-                            <span className="text-[11px] font-sans font-bold text-emerald-400/90 bg-emerald-500/5 px-3 py-1.5 rounded-lg border border-emerald-500/10 flex items-center gap-1">
+                            <span className="text-[11px] font-sans font-bold text-emerald-400/90 bg-emerald-500/5 px-3 py-1.5 rounded-md border border-emerald-500/10 flex items-center gap-1">
                               <CheckCircle2 className="w-3.5 h-3.5" />
                               DOWNLOADED & PURGED FROM HOST
                             </span>
@@ -784,7 +784,7 @@ export default function App() {
                             <a 
                               href={`/api/download/${job.id}`}
                               download
-                              className="text-[11px] font-bold text-sky-400 hover:text-sky-300 transition-colors flex items-center gap-1.5 bg-sky-500/10 hover:bg-sky-500/20 px-3 py-1.5 rounded-lg border border-sky-400/20 cursor-pointer"
+                              className="text-[11px] font-bold text-sky-400 hover:text-sky-300 transition-colors flex items-center gap-1.5 bg-sky-500/10 hover:bg-sky-500/20 px-3 py-1.5 rounded-md border border-sky-400/20 cursor-pointer"
                             >
                               <Download className="w-3.5 h-3.5" />
                               SAVE TO BROWSER
@@ -798,7 +798,7 @@ export default function App() {
                     <div className="flex shrink-0">
                       <button 
                         onClick={() => handleDeleteJob(job.id)}
-                        className="p-2 bg-[#0A0B0E] border border-slate-800 hover:border-red-900/60 hover:bg-red-950/20 rounded-lg transition-all text-slate-500 hover:text-red-400 group cursor-pointer"
+                        className="p-2 bg-[#0A0B0E] border border-slate-800 hover:border-red-900/60 hover:bg-red-950/20 rounded-md transition-all text-slate-500 hover:text-red-400 group cursor-pointer"
                         title={isActive ? "Cancel Queue" : "Wipe record & caching"}
                       >
                         <Trash2 className="w-4 h-4" />
