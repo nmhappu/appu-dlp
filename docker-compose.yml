@@ -1,0 +1,12 @@
+services:
+  dl-plex:
+    build: .
+    container_name: dl-plex-downloader
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./downloads:/app/downloads
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
