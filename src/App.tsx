@@ -305,7 +305,7 @@ export default function App() {
           </div>
           <div className="flex flex-col">
             <span className="font-bold text-lg tracking-tight text-white flex items-center">
-              DL-Plex 
+              appu-dlp
               <span style={{ color: APP_COLORS.skyGlow }} className="text-xs font-mono font-bold ml-1.5 uppercase">
                 v2.4
               </span>
@@ -820,7 +820,7 @@ export default function App() {
         className="h-12 border-t border-slate-800/60 px-6 md:px-8 flex items-center justify-between text-[11px] font-mono text-slate-500 shrink-0"
       >
         <div>
-          <span>DL-Plex © {new Date().getFullYear()}</span>
+          <span>appu-dlp © {new Date().getFullYear()}</span>
         </div>
       </footer>
 

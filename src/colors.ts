@@ -1,4 +1,4 @@
-// Color configuration palette for the DL-Plex application to avoid hardcoding colors.
+// Color configuration palette for the appu-dlp application to avoid hardcoding colors.
 export const APP_COLORS = {
   // Primary dark canvas background
   bgPrimary: '#0A0B0E',

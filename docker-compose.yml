@@ -1,7 +1,7 @@
 services:
-  dl-plex:
-    build: .
-    container_name: dl-plex-downloader
+  appu-dlp:
+    image: ghcr.io/nmhappu/appu-dlp:${TAG:-sha-07295f3}
+    container_name: appu-dlp-downloader
     restart: unless-stopped
     ports:
       - "${PORT:-3000}:${PORT:-3000}"
