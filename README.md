@@ -1,18 +1,6 @@
 # appu-dlp
 
-A high-performance web file and media stream downloader interface built using React, Vite, Tailwind CSS, Express, and yt-dlp/curl.
-
-## Design Philosophy
-
-This application utilizes a strict, cohesive low-contrast dark canvas background combined with carefully balanced text layouts, custom typography, and compact borders to present a polished, technical space for stream downloads and media analysis.
-
-## Key Features
-
-- **Dual Engine Architecture**: Switch between yt-dlp for media extraction and curl for raw HTTP file buffering.
-- **Dynamic Format Resolution**: Inspects target URLs to extract available video/audio formats and resolutions.
-- **Configurable Transits**: Stream downloads directly via your browser with local browser saving, or buffer them on the host server disk.
-- **Active Cookie Session Injection**: Import standard Netscape cookies directly from your web session to bypass authentication paywalls or restrictions.
-- **Compact UI Boundaries**: Polished UI with compact border radii, unified transfer progress trackers, and real-time status banners.
+A web file and media stream downloader interface built using React, yt-dlp/curl.
 
 ## Getting Started
 
