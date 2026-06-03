@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { VideoInfo, DownloadJob } from './types';
 import { APP_COLORS } from './colors';
+import { getApiUrl, getBackendUrl, setBackendUrl, isNative } from './api';
 
 export default function App() {
   const [url, setUrl] = useState('');
@@ -37,19 +38,33 @@ export default function App() {
   const [cookiesLoaded, setCookiesLoaded] = useState(false);
 
   const [downloadTarget, setDownloadTarget] = useState<'server' | 'browser'>('browser');
+  
+  const [backendUrl, setBackendUrlState] = useState(getBackendUrl());
+  const [showBackendInput, setShowBackendInput] = useState(false);
+  const [tempBackendUrl, setTempBackendUrl] = useState(getBackendUrl());
+
+  useEffect(() => {
+    const handleBackendChange = () => {
+      setBackendUrlState(getBackendUrl());
+    };
+    window.addEventListener('appu_dlp_backend_changed', handleBackendChange);
+    return () => {
+      window.removeEventListener('appu_dlp_backend_changed', handleBackendChange);
+    };
+  }, []);
   const [engine, setEngine] = useState<'yt-dlp' | 'curl'>('yt-dlp');
   const autoDownloadedRef = useRef<Set<string>>(new Set());
 
   // Load if cookies exist on the server
   const checkCookies = useCallback(async () => {
     try {
-      const res = await fetch('/api/cookies');
+      const res = await fetch(getApiUrl('/api/cookies'));
       if (res.ok) {
         const data = await res.json();
         setCookiesLoaded(data.exists);
       }
     } catch (err) {}
-  }, []);
+  }, [backendUrl]);
 
   useEffect(() => {
     checkCookies();
@@ -58,7 +73,7 @@ export default function App() {
   const handleSaveCookies = async (cookiesTextToSave?: string) => {
     const textToSave = cookiesTextToSave !== undefined ? cookiesTextToSave : cookiesContent;
     try {
-      const res = await fetch('/api/cookies', {
+      const res = await fetch(getApiUrl('/api/cookies'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cookies: textToSave })
@@ -92,7 +107,7 @@ export default function App() {
   // Fetch all background transfer jobs
   const fetchJobs = useCallback(async () => {
     try {
-      const res = await fetch('/api/jobs');
+      const res = await fetch(getApiUrl('/api/jobs'));
       if (res.ok) {
         const data: DownloadJob[] = await res.json();
         setJobs(data);
@@ -105,7 +120,7 @@ export default function App() {
               
               // Programmatically click browser download link
               const link = document.createElement('a');
-              link.href = `/api/download/${job.id}`;
+              link.href = getApiUrl(`/api/download/${job.id}`);
               link.download = '';
               document.body.appendChild(link);
               link.click();
@@ -122,7 +137,7 @@ export default function App() {
     } catch (err) {
       console.error('Failed to fetch transfer jobs:', err);
     }
-  }, []);
+  }, [backendUrl]);
 
   // Setup periodic background polling loops
   useEffect(() => {
@@ -145,7 +160,7 @@ export default function App() {
     setCustomFilename('');
 
     try {
-      const res = await fetch('/api/info', {
+      const res = await fetch(getApiUrl('/api/info'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: url.trim(), engine })
@@ -191,7 +206,7 @@ export default function App() {
         engine
       };
 
-      const res = await fetch('/api/download', {
+      const res = await fetch(getApiUrl('/api/download'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -216,7 +231,7 @@ export default function App() {
   // Wipe download task logs + caches
   const handleDeleteJob = async (jobId: string) => {
     try {
-      const res = await fetch(`/api/jobs/${jobId}`, {
+      const res = await fetch(getApiUrl(`/api/jobs/${jobId}`), {
         method: 'DELETE'
       });
 
@@ -303,16 +318,93 @@ export default function App() {
               <path d="M20 20H4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <div className="flex flex-col">
-            <span className="font-bold text-lg tracking-tight text-white flex items-center">
-              appu-dlp
-              <span style={{ color: APP_COLORS.skyGlow }} className="text-xs font-mono font-bold ml-1.5 uppercase">
-                v2.4
+          <div className="flex flex-col justify-center">
+            <div className="flex items-baseline gap-1.5">
+              <span className="font-bold text-lg tracking-tight text-white leading-none">
+                appu-dlp
               </span>
-            </span>
+              <span 
+                style={{ color: APP_COLORS.skyGlow }} 
+                className="text-[10px] font-mono font-bold select-none leading-none opacity-80 uppercase tracking-wider"
+              >
+                v0.1-beta
+              </span>
+            </div>
           </div>
         </div>
+
+        <div className="flex items-center gap-3">
+          {isNative && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+              NATIVE APP
+            </span>
+          )}
+          
+          <button
+            onClick={() => {
+              setShowBackendInput(!showBackendInput);
+              setTempBackendUrl(getBackendUrl());
+            }}
+            style={{ 
+              borderColor: showBackendInput ? APP_COLORS.skyAccent : 'transparent',
+              backgroundColor: 'rgba(15, 23, 42, 0.6)'
+            }}
+            className={`p-2 rounded-md border flex items-center justify-center transition-all hover:bg-slate-800 text-slate-400 hover:text-white cursor-pointer ${
+              showBackendInput ? 'text-sky-400' : ''
+            }`}
+            title="Configure Backend Connection"
+          >
+            <Settings className="w-4 h-4" />
+          </button>
+        </div>
       </nav>
+
+      {showBackendInput && (
+        <div className="bg-[#141720]/95 border-b border-slate-800/80 px-6 py-4 animate-in slide-in-from-top-2 duration-200">
+          <div className="max-w-[1000px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h4 className="text-sm font-semibold text-white flex items-center gap-2">
+                <Cpu className="w-4 h-4 text-sky-400" />
+                Backend Connection Server
+              </h4>
+              <p className="text-xs text-slate-400 mt-1">
+                For Capacitor/Android, point this to your active remote server or local host IP (e.g. <code>http://192.168.1.50:3000</code>).
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-2 w-full md:w-auto">
+              <input
+                type="text"
+                value={tempBackendUrl}
+                onChange={(e) => setTempBackendUrl(e.target.value)}
+                placeholder="e.g. http://192.168.1.50:3000"
+                className="flex-1 md:w-72 bg-[#0A0B0E] border border-slate-800 focus:border-sky-500 rounded-md px-3 py-2 text-xs text-slate-200 outline-none transition-colors"
+              />
+              <button
+                onClick={() => {
+                  setBackendUrl(tempBackendUrl);
+                  setShowBackendInput(false);
+                  triggerNotification('success', 'Backend route updated successfully.');
+                }}
+                className="bg-sky-500 hover:bg-sky-400 text-white font-bold px-4 py-2 rounded-md text-xs transition-colors cursor-pointer"
+              >
+                Apply
+              </button>
+              <button
+                onClick={() => {
+                  setBackendUrl('');
+                  setTempBackendUrl('');
+                  setShowBackendInput(false);
+                  triggerNotification('success', 'Backend cleared. Resolving relative paths.');
+                }}
+                className="border border-slate-800 hover:bg-slate-800 text-slate-400 font-bold px-3 py-2 rounded-md text-xs transition-colors cursor-pointer"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Container Section */}
       <main className="flex-1 max-w-[1000px] w-full mx-auto flex flex-col p-4 md:p-8 gap-6 md:gap-8 min-h-0">
@@ -782,7 +874,7 @@ export default function App() {
                             </span>
                           ) : (
                             <a 
-                              href={`/api/download/${job.id}`}
+                              href={getApiUrl(`/api/download/${job.id}`)}
                               download
                               className="text-[11px] font-bold text-sky-400 hover:text-sky-300 transition-colors flex items-center gap-1.5 bg-sky-500/10 hover:bg-sky-500/20 px-3 py-1.5 rounded-md border border-sky-400/20 cursor-pointer"
                             >
