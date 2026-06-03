@@ -4,7 +4,7 @@ services:
     container_name: appu-dlp-downloader
     restart: unless-stopped
     ports:
-      - "${PORT:-3000}:${PORT:-3000}"
+      - "${HOST_PORT:-3000}:${PORT:-3000}"
     volumes:
       - ./downloads:/app/downloads
     environment:
