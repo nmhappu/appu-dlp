@@ -8,8 +8,22 @@ import { DownloadJob, VideoInfo, VideoFormat } from './src/types';
 
 const YTDlpWrap = (YTDlpWrapClass as any).default || YTDlpWrapClass;
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Resolve paths safely in both dev (ESM via tsx) and prod (bundled CJS via esbuild)
+let resolvedFilename = '';
+let resolvedDirname = '';
+
+try {
+  if (typeof import.meta !== 'undefined' && import.meta && import.meta.url) {
+    resolvedFilename = fileURLToPath(import.meta.url);
+    resolvedDirname = path.dirname(resolvedFilename);
+  } else {
+    resolvedFilename = __filename;
+    resolvedDirname = __dirname;
+  }
+} catch {
+  resolvedFilename = __filename;
+  resolvedDirname = __dirname;
+}
 
 const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
@@ -18,7 +32,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Create downloads folder if not exists
-const DOWNLOADS_DIR = path.join(__dirname, 'downloads');
+const DOWNLOADS_DIR = path.join(resolvedDirname, 'downloads');
 if (!fs.existsSync(DOWNLOADS_DIR)) {
   fs.mkdirSync(DOWNLOADS_DIR, { recursive: true });
 }
@@ -43,7 +57,7 @@ async function setupYtDlp() {
       console.log('System yt-dlp not found, checking local binary...');
     }
 
-    const localPath = path.join(__dirname, 'yt-dlp');
+    const localPath = path.join(resolvedDirname, 'yt-dlp');
     if (fs.existsSync(localPath)) {
       try {
         execSync(`"${localPath}" --version`, { stdio: 'ignore' });
@@ -208,7 +222,7 @@ app.post('/api/info', async (req, res) => {
       '--user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     ];
 
-    const cookiesPath = path.join(__dirname, 'cookies.txt');
+    const cookiesPath = path.join(resolvedDirname, 'cookies.txt');
     if (fs.existsSync(cookiesPath)) {
       args.push('--cookies', cookiesPath);
     }
@@ -418,7 +432,7 @@ async function runDownloadAsync(jobId: string) {
     args.push('--js-runtimes', 'node');
     args.push('--user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
 
-    const cookiesPath = path.join(__dirname, 'cookies.txt');
+    const cookiesPath = path.join(resolvedDirname, 'cookies.txt');
     if (fs.existsSync(cookiesPath)) {
       args.push('--cookies', cookiesPath);
     }
@@ -488,7 +502,7 @@ app.post('/api/cookies', (req, res) => {
     return res.status(400).json({ error: 'Cookies content is required' });
   }
 
-  const cookiesPath = path.join(__dirname, 'cookies.txt');
+  const cookiesPath = path.join(resolvedDirname, 'cookies.txt');
   try {
     if (cookies.trim() === '') {
       if (fs.existsSync(cookiesPath)) {
@@ -506,7 +520,7 @@ app.post('/api/cookies', (req, res) => {
 
 // GET /api/cookies -> Retrieve cookie configuration status
 app.get('/api/cookies', (req, res) => {
-  const cookiesPath = path.join(__dirname, 'cookies.txt');
+  const cookiesPath = path.join(resolvedDirname, 'cookies.txt');
   const exists = fs.existsSync(cookiesPath);
   let length = 0;
   if (exists) {
@@ -598,7 +612,7 @@ app.get('/api/download/:jobId', (req, res) => {
 });
 
 // Serve frontend static bundles
-const distPath = path.join(__dirname, 'dist');
+const distPath = path.join(resolvedDirname, 'dist');
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
   app.get('*', (req, res, next) => {
