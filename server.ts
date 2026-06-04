@@ -611,18 +611,32 @@ app.get('/api/download/:jobId', (req, res) => {
   res.status(404).json({ error: 'Completed file not found on disk.' });
 });
 
-// Serve frontend static bundles
-const distPath = path.join(resolvedDirname, 'dist');
-if (fs.existsSync(distPath)) {
-  app.use(express.static(distPath));
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api/')) {
-      return next();
-    }
-    res.sendFile(path.join(distPath, 'index.html'));
+async function startServer() {
+  // Vite middleware for development or fallback static serving in production
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('Loading Vite middleware in development mode...');
+    const { createServer: createViteServer } = await import('vite');
+    const vite = await createViteServer({
+      server: { middlewareMode: true },
+      appType: 'spa',
+    });
+    app.use(vite.middlewares);
+  } else {
+    const distPath = path.join(resolvedDirname, 'dist');
+    app.use(express.static(distPath));
+    app.get('*', (req, res, next) => {
+      if (req.path.startsWith('/api/')) {
+        return next();
+      }
+      res.sendFile(path.join(distPath, 'index.html'));
+    });
+  }
+
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`yt-dlp Web Server running perfectly on http://0.0.0.0:${PORT}`);
   });
 }
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`yt-dlp Web Server running perfectly on http://0.0.0.0:${PORT}`);
+startServer().catch(err => {
+  console.error('Failed to start server:', err);
 });
