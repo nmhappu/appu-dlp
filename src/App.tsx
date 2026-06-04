@@ -55,6 +55,55 @@ export default function App() {
   const [engine, setEngine] = useState<'yt-dlp' | 'curl'>('yt-dlp');
   const autoDownloadedRef = useRef<Set<string>>(new Set());
 
+  const [ytdlpVersion, setYtdlpVersion] = useState<string>('Loading...');
+  const [ytdlpReady, setYtdlpReady] = useState<boolean>(false);
+  const [isUpgradingYtdlp, setIsUpgradingYtdlp] = useState<boolean>(false);
+
+  const fetchYtdlpStatus = useCallback(async () => {
+    try {
+      const res = await fetch(getApiUrl('/api/ytdlp/status'));
+      if (res.ok) {
+        const data = await res.json();
+        setYtdlpVersion(data.version || 'Unknown');
+        setYtdlpReady(data.ready);
+      } else {
+        setYtdlpVersion('Unavailable');
+        setYtdlpReady(false);
+      }
+    } catch {
+      setYtdlpVersion('Unavailable');
+      setYtdlpReady(false);
+    }
+  }, [backendUrl]);
+
+  useEffect(() => {
+    fetchYtdlpStatus();
+  }, [fetchYtdlpStatus]);
+
+  const triggerYtdlpUpgrade = async () => {
+    if (isUpgradingYtdlp) return;
+    setIsUpgradingYtdlp(true);
+    triggerNotification('success', 'Updating yt-dlp core binary to the latest GitHub release. Please wait...');
+    try {
+      const res = await fetch(getApiUrl('/api/ytdlp/upgrade'), {
+        method: 'POST'
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setYtdlpVersion(data.version || 'Upgraded');
+        setYtdlpReady(true);
+        triggerNotification('success', `Upgraded to latest official version successfully: ${data.version || ''}`);
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || 'Server rejected upgrade request.');
+      }
+    } catch (err: any) {
+      triggerNotification('error', `Failed to upgrade: ${err.message || err}`);
+    } finally {
+      setIsUpgradingYtdlp(false);
+    }
+  };
+
   // Load if cookies exist on the server
   const checkCookies = useCallback(async () => {
     try {
@@ -360,48 +409,105 @@ export default function App() {
       </nav>
 
       {showBackendInput && (
-        <div className="bg-[#141720]/95 border-b border-slate-800/80 px-6 py-4 animate-in slide-in-from-top-2 duration-200">
-          <div className="max-w-[1000px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h4 className="text-sm font-semibold text-white flex items-center gap-2">
-                <Cpu className="w-4 h-4 text-sky-400" />
-                Backend Connection Server
-              </h4>
-              <p className="text-xs text-slate-400 mt-1">
-                For Capacitor/Android, point this to your active remote server or local host IP (e.g. <code>http://192.168.1.50:3000</code>).
-              </p>
-            </div>
+        <div className="bg-[#141720]/97 border-b border-slate-800/80 px-6 py-5 animate-in slide-in-from-top-2 duration-200">
+          <div className="max-w-[1000px] mx-auto flex flex-col gap-5">
             
-            <div className="flex items-center gap-2 w-full md:w-auto">
-              <input
-                type="text"
-                value={tempBackendUrl}
-                onChange={(e) => setTempBackendUrl(e.target.value)}
-                placeholder="e.g. http://192.168.1.50:3000"
-                className="flex-1 md:w-72 bg-[#0A0B0E] border border-slate-800 focus:border-sky-500 rounded-md px-3 py-2 text-xs text-slate-200 outline-none transition-colors"
-              />
-              <button
-                onClick={() => {
-                  setBackendUrl(tempBackendUrl);
-                  setShowBackendInput(false);
-                  triggerNotification('success', 'Backend route updated successfully.');
-                }}
-                className="bg-sky-500 hover:bg-sky-400 text-white font-bold px-4 py-2 rounded-md text-xs transition-colors cursor-pointer"
-              >
-                Apply
-              </button>
-              <button
-                onClick={() => {
-                  setBackendUrl('');
-                  setTempBackendUrl('');
-                  setShowBackendInput(false);
-                  triggerNotification('success', 'Backend cleared. Resolving relative paths.');
-                }}
-                className="border border-slate-800 hover:bg-slate-800 text-slate-400 font-bold px-3 py-2 rounded-md text-xs transition-colors cursor-pointer"
-              >
-                Reset
-              </button>
+            {/* Row 1: Backend Connection Config */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800/60">
+              <div>
+                <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                  <Cpu className="w-4 h-4 text-sky-400" />
+                  Backend Connection Server
+                </h4>
+                <p className="text-xs text-slate-400 mt-1">
+                  For Capacitor/Android apps, point this to your active remote server or local host IP (e.g. <code>http://192.168.1.50:3000</code>).
+                </p>
+              </div>
+              
+              <div className="flex items-center gap-2 w-full md:w-auto">
+                <input
+                  type="text"
+                  value={tempBackendUrl}
+                  onChange={(e) => setTempBackendUrl(e.target.value)}
+                  placeholder="e.g. http://192.168.1.50:3000"
+                  className="flex-1 md:w-72 bg-[#0A0B0E] border border-slate-800 focus:border-sky-500 rounded-md px-3 py-2 text-xs text-slate-200 outline-none transition-colors"
+                />
+                <button
+                  onClick={() => {
+                    setBackendUrl(tempBackendUrl);
+                    setShowBackendInput(false);
+                    triggerNotification('success', 'Backend route updated successfully.');
+                  }}
+                  className="bg-sky-500 hover:bg-sky-400 text-white font-bold px-4 py-2 rounded-md text-xs transition-colors cursor-pointer"
+                >
+                  Apply
+                </button>
+                <button
+                  onClick={() => {
+                    setBackendUrl('');
+                    setTempBackendUrl('');
+                    setShowBackendInput(false);
+                    triggerNotification('success', 'Backend cleared. Resolving relative paths.');
+                  }}
+                  className="border border-slate-800 hover:bg-slate-800 text-slate-400 font-bold px-3 py-2 rounded-md text-xs transition-colors cursor-pointer"
+                >
+                  Reset
+                </button>
+              </div>
             </div>
+
+            {/* Row 2: yt-dlp Core Engine Control */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                  <RefreshCw className="w-4 h-4 text-emerald-400" />
+                  yt-dlp Core Downloader Engine
+                </h4>
+                <p className="text-xs text-slate-400 mt-1 flex flex-wrap items-center gap-2">
+                  Installed Engine Version: 
+                  <code className="bg-[#0A0B0E] px-1.5 py-0.5 rounded text-sky-400 font-mono font-bold text-[11px] border border-slate-800/60 break-all">
+                    {ytdlpVersion}
+                  </code>
+                  {ytdlpReady ? (
+                    <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 uppercase tracking-widest">
+                      Active
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-[10px] text-rose-400 font-bold bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20 uppercase tracking-widest animate-pulse">
+                      Pending
+                    </span>
+                  )}
+                </p>
+                <p className="text-[11px] text-slate-500 mt-1.5">
+                  Host platforms throttle speed for outdated yt-dlp binaries. Update below to pull the official latest build directly from GitHub.
+                </p>
+              </div>
+              
+              <div className="flex items-center gap-2 w-full md:w-auto shrink-0 justify-end">
+                <button
+                  onClick={triggerYtdlpUpgrade}
+                  disabled={isUpgradingYtdlp}
+                  style={{
+                    backgroundColor: isUpgradingYtdlp ? 'rgba(30, 41, 59, 0.4)' : `${APP_COLORS.skyAccent}15`,
+                    borderColor: isUpgradingYtdlp ? 'rgba(51, 65, 85, 0.4)' : `${APP_COLORS.skyAccent}30`
+                  }}
+                  className="rounded-md border text-xs px-4 py-2 font-bold hover:text-white transition-all cursor-pointer text-sky-400 hover:bg-sky-500/10 flex items-center gap-2 disabled:cursor-not-allowed w-full md:w-auto justify-center select-none"
+                >
+                  {isUpgradingYtdlp ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-sky-400" />
+                      Downloading Update...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5" />
+                      Force Update Core Binary
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
       )}

@@ -131,6 +131,56 @@ app.get('/api/storage', (req, res) => {
   });
 });
 
+// GET /api/ytdlp/status -> Retrieve yt-dlp version & update status
+app.get('/api/ytdlp/status', (req, res) => {
+  let version = 'unknown';
+  if (isReady) {
+    try {
+      version = execSync(`"${ytDlpPath}" --version`).toString().trim();
+    } catch (e: any) {
+      console.warn('Failed to query yt-dlp version string:', e.message);
+    }
+  }
+  res.json({
+    ready: isReady,
+    status: statusMessage,
+    path: ytDlpPath,
+    version: version
+  });
+});
+
+// POST /api/ytdlp/upgrade -> Perform immediate force re-download of latest yt-dlp from GitHub
+app.post('/api/ytdlp/upgrade', async (req, res) => {
+  try {
+    isReady = false;
+    statusMessage = 'Upgrading yt-dlp to latest version...';
+    console.log('Force upgrading yt-dlp from GitHub releases...');
+
+    const localPath = path.join(resolvedDirname, 'yt-dlp');
+    
+    // Download latest release from GitHub
+    await YTDlpWrap.downloadFromGithub(localPath);
+    
+    try {
+      fs.chmodSync(localPath, '755');
+    } catch (err) {
+      console.warn('Could not chmod upgraded local yt-dlp binary:', err);
+    }
+
+    ytDlpPath = localPath;
+    isReady = true;
+    statusMessage = 'yt-dlp upgraded to latest official version successfully.';
+    
+    const version = execSync(`"${ytDlpPath}" --version`).toString().trim();
+    res.json({ success: true, message: `Upgraded successfully to version ${version}`, version });
+  } catch (error: any) {
+    console.error('Failed to upgrade yt-dlp:', error);
+    statusMessage = `Failed to upgrade: ${error.message || error}`;
+    isReady = true; // Set back to true so existing can still be used if possible
+    res.status(500).json({ error: error.message || 'Failed to download updated executable' });
+  }
+});
+
 // POST /api/info -> Extract specifications
 app.post('/api/info', async (req, res) => {
   const { url, engine } = req.body;
